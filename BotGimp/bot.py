@@ -8,29 +8,27 @@ from botcity.maestro import *
 BotMaestroSDK.RAISE_NOT_CONNECTED = False
 
 def open_gimp(bot, gimp_executable_path):
-        # Launching the app
-        bot.execute(gimp_executable_path)
-        bot.connect_to_app(backend=Backend.UIA, path=gimp_executable_path)
-        
-        bot.wait(10000)
+    # Launching the app
+    bot.execute(gimp_executable_path)
+    bot.connect_to_app(backend=Backend.UIA, path=gimp_executable_path)        
+    gimp_main_window = bot.find_app_window(title_re="GNU", waiting_time=20000)
+    if gimp_main_window.exists():
         bot.clickAt(bot.display_size()[0]/2-500, bot.display_size()[1]/2)
-        bot.maximize_window()
+        bot.maximize_window()    
 
 def open_files(bot, input_path):
     bot.control_key("o")
-    bot.wait(1000)
+    bot.wait(500)
     bot.type_down()
-    
-    path_input = input_path
-    bot.kb_type(path_input)
+    bot.kb_type(input_path)
     bot.enter()
     
     bot.control_a()
     bot.type_left()
     bot.type_down()
-    bot.control_a()
+    bot.control_a() 
     bot.enter()
-    bot.wait(4000)
+    bot.wait(8000)
 
 def crop_to_content(bot):
     bot.clickAt(bot.display_size()[0]/2-500, bot.display_size()[1]/2)
@@ -47,12 +45,14 @@ def crop_to_content(bot):
 def export_file(bot, output_path):
     #Export
     bot.control_key("e")
-    bot.wait(1000)
+    bot.wait(500)
     bot.type_left()
     
     bot.kb_type(output_path+"\\")
     bot.enter()
+    
     bot.wait(3000)
+
     bot.enter()
 
 
@@ -67,14 +67,15 @@ def main():
     print(f"Task Parameters are: {execution.parameters}")
 
     bot = DesktopBot()
-
     # Implement here your logic...
-    
+
     # Application path
     gimp_executable_path = r"C:\Program Files\GIMP 2\bin\gimp-2.10.exe"
 
     open_gimp(bot, gimp_executable_path)
+
     
+
     script_directory = os.path.dirname(os.path.abspath(__file__))
     input_path = os.path.join(os.path.dirname(script_directory), "Input")
     output_path = os.path.join(os.path.dirname(script_directory), "Output")
