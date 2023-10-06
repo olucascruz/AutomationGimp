@@ -11,10 +11,11 @@ def open_gimp(bot, gimp_executable_path):
     # Launching the app
     bot.execute(gimp_executable_path)
     bot.connect_to_app(backend=Backend.UIA, path=gimp_executable_path)        
-    gimp_main_window = bot.find_app_window(title_re="GNU", waiting_time=20000)
+    gimp_main_window = bot.find_app_window(title_re="GNU", waiting_time=30000)
     if gimp_main_window.exists():
         bot.clickAt(bot.display_size()[0]/2-500, bot.display_size()[1]/2)
-        bot.maximize_window()    
+        bot.maximize_window()
+    return gimp_main_window.exists()    
 
 def open_files(bot, input_path):
     bot.control_key("o")
@@ -72,28 +73,27 @@ def main():
     # Application path
     gimp_executable_path = r"C:\Program Files\GIMP 2\bin\gimp-2.10.exe"
 
-    open_gimp(bot, gimp_executable_path)
+    if open_gimp(bot, gimp_executable_path):
 
-    
+        script_directory = os.path.dirname(os.path.abspath(__file__))
+        input_path = os.path.join(os.path.dirname(script_directory), "Input")
+        output_path = os.path.join(os.path.dirname(script_directory), "Output")
 
-    script_directory = os.path.dirname(os.path.abspath(__file__))
-    input_path = os.path.join(os.path.dirname(script_directory), "Input")
-    output_path = os.path.join(os.path.dirname(script_directory), "Output")
+        
+        open_files(bot, input_path)
 
-    
-    open_files(bot, input_path)
+        number_files_inputs = len(os.listdir(input_path))
+        for _ in range(number_files_inputs):
+            crop_to_content(bot)
+            export_file(bot, output_path)
 
-    number_files_inputs = len(os.listdir(input_path))
-    for _ in range(number_files_inputs):
-        crop_to_content(bot)
-        export_file(bot, output_path)
+            bot.wait(1000)
+            #Close file
+            bot.control_key("w")
+            bot.control_key("d")
 
-        #Close file
-        bot.control_key("w")
-        bot.control_key("d")
-
-    #Close gimp
-    bot.alt_f4()
+        #Close gimp
+        bot.alt_f4()
 
 
     # Uncomment to mark this task as finished on BotMaestro
